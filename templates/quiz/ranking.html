@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}🌍 Global Quiz Ranking{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .ranking-wrapper {
+        max-width: 1000px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2, h3 {
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .ranking-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .ranking-table th, .ranking-table td {
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+
+    .ranking-table th {
+        background-color: #0f172a;
+        color: #ffffff;
+    }
+
+    .ranking-table tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .ranking-table tr.table-success {
+        background-color: #d1fae5 !important;
+    }
+
+    .badge {
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-fast {
+        background-color: #facc15;
+        color: #78350f;
+    }
+
+    .medal {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .gold { color: #fbbf24; }
+    .silver { color: #cbd5e1; }
+    .bronze { color: #f97316; }
+
+    .no-history {
+        text-align: center;
+        color: #6b7280;
+        margin-top: 1rem;
+        font-style: italic;
+    }
+</style>
+
+<div class="ranking-wrapper">
+    <h2>🌍 Global Quiz Ranking</h2>
+
+    <table class="ranking-table">
+        <thead>
+            <tr>
+                <th>🏆 Rank</th>
+                <th>👤 User</th>
+                <th>🧠 Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rank in rankings %}
+                <tr {% if rank.user == user %} class="table-success" {% endif %}>
+                    <td>
+                        {% if forloop.counter == 1 %}
+                            <span class="medal gold">🥇</span>
+                        {% elif forloop.counter == 2 %}
+                            <span class="medal silver">🥈</span>
+                        {% elif forloop.counter == 3 %}
+                            <span class="medal bronze">🥉</span>
+                        {% else %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    </td>
+                    <td>{{ rank.user.username }}</td>
+                    <td><i class="score-icon">✨</i>{{ rank.total_score }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3">No rankings yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>📚 Your Subject-wise Test History</h2>
+
+    {% if user_scores_by_subject %}
+        {% for subject, attempts in user_scores_by_subject.items %}
+            <h3>📝 {{ subject }}</h3>
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th>📅 Date</th>
+                        <th>🧪 Test</th>
+                        <th>💯 Score</th>
+                        <th>⏱ Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attempt in attempts %}
+                        <tr>
+                            <td>{{ attempt.date_taken|date:"M d, Y H:i" }}</td>
+                            <td>{{ attempt.test_name }}</td>
+                            <td>{{ attempt.score }}</td>
+                            <td>
+                                {% if attempt.duration %}
+                                    {{ attempt.duration }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p class="no-history">No test history available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

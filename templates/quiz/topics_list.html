@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+{% load static %}
+{% load quiz_tags %}
+
+{% block title %}Quiz Topics{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .quiz-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 4rem auto;
+        padding: 0 2rem;
+    }
+
+    .quiz-card {
+        background: rgb(255, 255, 255);
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .quiz-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .quiz-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .quiz-card .card-content {
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    .quiz-card h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .quiz-card p {
+        font-size: 0.95rem;
+        color: #475569;
+        margin-bottom: 0.3rem;
+    }
+
+    .quiz-card .start-btn {
+        display: inline-block;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 999px;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .quiz-card .start-btn:hover {
+        background: linear-gradient(135deg, #4f46e5, #9333ea);
+        transform: scale(1.05);
+    }
+
+    .description-wrapper {
+        position: relative;
+        text-align: center;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+
+    .short-desc {
+        display: inline;
+    }
+
+    .read-more-btn {
+        background: rgb(61, 113, 255);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: underline;
+        border: none;
+        cursor: pointer;
+        display: inline;
+        padding: 0;
+        margin-left: 4px;
+    }
+
+    .read-more-btn:hover {
+        opacity: 0.8;
+    }
+
+    .tooltip {
+        display: none;
+        position: absolute;
+        width: 280px;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: #ffffff;
+        color: rgb(0, 0, 0);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        bottom: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        font-size: 0.9rem;
+        line-height: 1.4;
+        z-index: 10;
+        white-space: normal;
+        text-align: left;
+    }
+
+    .tooltip::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .tooltip::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .tooltip::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    .tooltip::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    .description-wrapper.active .tooltip {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .quiz-container {
+            padding: 0 1rem;
+        }
+
+        .tooltip {
+            width: 220px;
+            font-size: 0.85rem;
+        }
+
+        .search-bar {
+            flex-direction: column;
+            width: 90%;
+            margin-left: 5%;
+            padding: 1rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    .floating-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(79, 69, 215, 0.85);
+        color: white;
+        padding: 1.2rem 2rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-align: center;
+        z-index: 9999;
+        animation: fadein 0.5s, fadeout 0.5s 4.5s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes fadein {
+        from { opacity: 0; transform: translate(-50%, -60%); }
+        to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    @keyframes fadeout {
+        from { opacity: 1; transform: translate(-50%, -50%); }
+        to { opacity: 0; transform: translate(-50%, -60%); }
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 30px;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        align-items: center;
+        width: 80%;
+        margin: 10rem auto 2rem;
+    }
+
+    .search-bar input,
+    .search-bar select {
+        flex: 1;
+        padding: 0.6rem 1rem;
+        border-radius: 20px;
+        border: ridge;
+        border-color: rgb(98, 143, 240);
+        outline: none;
+        background-color: #ffffff;
+        font-size: 0.9rem;
+        color: #111827;
+    }
+
+    .search-bar input::placeholder {
+        color: #5976ae;
+        font-weight: 400;
+        font-family: 'Inter', sans-serif;
+        text-align: center;
+    }
+
+    .search-bar button {
+        padding: 0.6rem 1.5rem;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        font-size: 0.9rem;
+        font-weight: bold;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-bar button:hover {
+        background: linear-gradient(135deg, #4f46e5, #9333ea);
+        transform: scale(1.05);
+    }
+
+    .user-score-box {
+        position: absolute;
+        top: 6rem;
+        right: 2rem;
+        background-color: #e0f2fe;
+        color: #0c4a6e;
+        padding: 0.6rem 1.2rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        z-index: 999;
+    }
+
+    @media (max-width: 768px) {
+        .user-score-box {
+            position: static;
+            text-align: center;
+            margin: 1rem auto;
+        }
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    button {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        background: #3b82f6;
+        color: white;
+        font-size: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 0.5rem;
+    }
+
+    button:hover {
+        background: #4f46e5;
+    }
+</style>
+
+<div class="user-score-box">
+    {% get_user_score as score %}
+    {% if score != "" %}
+        <span>🏅 Your Score: <strong>{{ score }}</strong></span>
+    {% endif %}
+</div>
+<br>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="floating-message">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.floating-message').forEach(el => el.remove());
+        }, 1500);
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('floating-message')) {
+                e.target.remove();
+            }
+        });
+    </script>
+{% endif %}
+
+<form method="get" class="search-bar">
+    <select name="category">
+        <option value="">Select Category</option>
+        {% for category in categories %}
+            <option value="{{ category.category }}" {% if selected_category == category.category %}selected{% endif %}>
+                {{ category.category|title }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="difficulty">
+        <option value="">Select Difficulty</option>
+        <option value="Easy" {% if selected_difficulty == "Easy" %}selected{% endif %}>Easy</option>
+        <option value="Medium" {% if selected_difficulty == "Medium" %}selected{% endif %}>Medium</option>
+        <option value="Hard" {% if selected_difficulty == "Hard" %}selected{% endif %}>Hard</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+<section>
+    <div class="quiz-container">
+        {% for topic in topics %}
+            <div class="quiz-card">
+                {% if topic.image %}
+                    <img src="{{ topic.image.url }}" alt="{{ topic.name }}" style="display: block; margin: 0 auto; width: 250px; height: auto;">
+                {% else %}
+                    <img src="{% static 'images/default_topic.jpg' %}" alt="Default Topic">
+                {% endif %}
+                <div class="card-content">
+                    <h2>{{ topic.name }}</h2>
+                    <div class="description-wrapper">
+                        <span class="short-desc">{{ topic.description|truncatewords:10 }}...</span>
+                        <button class="read-more-btn" onclick="toggleTooltip(this)">Read more</button>
+                        <div class="tooltip">{{ topic.description }}</div>
+                    </div>
+                    <p><strong>Difficulty:</strong> {{ topic.difficulty }}</p>
+                    <p><strong>Time Limit:</strong> {{ topic.time_limit }} mins</p>
+                    <p><strong>Total Questions:</strong> {{ topic.total_questions }}</p>
+                    <a href="#" class="start-btn" onclick="showConfirmationModal({{ topic.id }})">Start Quiz</a>
+                </div>
+            </div>
+        {% empty %}
+            <p style="text-align:center; font-weight: bold; margin-top: 2rem;">No topics found for your filter.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Are you sure you want to start this quiz?</h3>
+        <button id="confirmStartBtn">Yes, start quiz</button>
+        <button onclick="cancelQuiz()">No, cancel</button>
+    </div>
+</div>
+
+
+<script>
+    let startQuizUrl = '';
+
+    function showConfirmationModal(topicId) {
+    const modal = document.getElementById('confirmationModal');
+    modal.style.display = 'flex';
+    document.getElementById('confirmStartBtn').setAttribute('onclick', 'startQuiz(' + topicId + ')');
+    }
+
+    function startQuiz(topicId) {
+        window.location.href = "/quiz/start/" + topicId + "/";  // Redirect to quiz start URL
+    }
+
+    function cancelQuiz() {
+    // Option 1: Close modal only
+    document.getElementById('confirmationModal').style.display = 'none';
+
+    // Option 2: Reload the current page (uncomment this if you really want a reload)
+    // location.reload();
+    }
+
+
+    document.getElementById('confirmBtn').addEventListener('click', function () {
+        window.location.href = startQuizUrl; // Navigate to the quiz URL
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', function () {
+        const modal = document.getElementById('confirmationModal');
+        modal.style.display = 'none'; // Close the modal
+    });
+
+    window.onclick = function (event) {
+        const modal = document.getElementById('confirmationModal');
+        if (event.target === modal) {
+            modal.style.display = 'none'; // Close the modal if clicked outside
+        }
+    };
+</script>
+
+{% endblock %}

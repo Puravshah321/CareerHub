@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Application Details{% endblock %}
+{% block content %}
+<main class="pt-16 max-w-4xl mx-auto px-4 py-10">
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-2xl font-bold mb-4">Application Details</h2>
+
+        <p><strong>Applicant:</strong> {{ application.job_seeker.user.username }}</p>
+        {% if application.GlobalRanking %}
+            <p><strong>Global Score:</strong> {{ application.GlobalRanking.total_score }}</p>
+        {% else %}
+            <p><strong>Global Score:</strong> Not assigned</p>
+        {% endif %}
+        <p><strong>Email:</strong> {{ application.job_seeker.user.email }}</p>
+        <p><strong>Applied Job:</strong> {{ application.job.title }}</p>
+        <p><strong>Applied On:</strong> {{ application.applied_date|date:"M d, Y" }}</p>
+        <p><strong>Status:</strong> {{ application.get_status_display }}</p>
+        <p><strong>Cover Letter:</strong></p>
+        <p class="border p-3 rounded mt-2 bg-gray-50">{{ application.cover_letter }}</p>
+
+        {% if application.job_seeker.resume %}
+        <p class="mt-4">
+            <strong>Resume:</strong>
+            <a href="{{ application.job_seeker.resume.url }}" target="_blank" class="text-blue-600 underline">View Resume</a>
+        </p>
+        {% else %}
+        <p class="mt-4 text-gray-500"><strong>Resume:</strong> Not uploaded</p>
+        {% endif %}
+
+
+        <div class="mt-6">
+            <a href="{% url 'dashboard:employer_dashboard' %}" class="text-sm text-gray-600 hover:text-gray-800">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+</main>
+{% endblock %}

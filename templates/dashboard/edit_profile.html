@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<main class="pt-24 px-4 md:px-8 max-w-4xl mx-auto">
+    <div class="bg-white shadow-xl rounded-xl p-10 border border-gray-200">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Edit Your Profile</h2>
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+            <div class="space-y-6">
+                <!-- Form fields with improved readability -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {{ form.as_p }}
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-8">
+                <button 
+                    type="submit" 
+                    class="inline-block bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300"
+                >
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume - JobPortal{% endblock %}
+
+{% block extra_head %}
+    <style>
+        @media print {
+            button {
+                display: none !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="pt-16">
+    <!-- Resume Section -->
+    <section class="bg-gradient-to-b from-purple-100 to-purple-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-lg p-8 relative group">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-purple-700">{{ name }}</h1>
+                <p class="text-lg text-gray-600">{{ about }}</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div>
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mb-4">Personal Information</h2>
+                    <p><strong>Name:</strong> {{ name }}</p>
+                    <p><strong>Age:</strong> {{ age }}</p>
+                    <p><strong>Email:</strong> {{ email }}</p>
+                    <p><strong>Phone:</strong> +91-{{ phone }}</p>
+
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mt-8 mb-4">Skills</h2>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        {% for skill in skills %}
+                            <li>{{ skill }}</li>
+                        {% empty %}
+                            <li>No skills listed.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mt-8 mb-4">Education</h2>
+                    {% for edu in education %}
+                        <div class="mb-4">
+                            <h3 class="font-medium">{{ edu.degree }}</h3>
+                            <p>{{ edu.college }} - {{ edu.year }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No education listed.</p>
+                    {% endfor %}
+
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mt-8 mb-4">Languages</h2>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        {% for lang in languages %}
+                            <li>{{ lang }}</li>
+                        {% empty %}
+                            <li>No languages listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mt-8 mb-4">Projects</h2>
+                    {% for project in projects %}
+                        <div class="mb-6">
+                            <h3 class="font-medium">{{ project.title }}</h3>
+                            <p><strong>Duration:</strong> {{ project.duration }}</p>
+                            <!-- <p>{{ project.description }}</p> -->
+                        </div>
+                    {% empty %}
+                        <p>No projects listed.</p>
+                    {% endfor %}
+
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mt-8 mb-4">Work Experience</h2>
+                    {% for exp in experience %}
+                        <div class="mb-6">
+                            <h3 class="font-medium">{{ exp.company }}</h3>
+                            <!-- <p><strong>Position:</strong> {{ exp.position }}</p> -->
+                            <p><strong>Duration:</strong> {{ exp.duration }}</p>
+                            <p>{{ exp.description }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No work experience listed.</p>
+                    {% endfor %}
+
+                    <h2 class="text-xl font-semibold text-purple-800 border-b pb-2 mt-8 mb-4">Achievements</h2>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        {% for achievement in achievements %}
+                            <li>{{ achievement }}</li>
+                        {% empty %}
+                            <li>No achievements listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <button onclick="generatePDF()" 
+                        class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-all">
+                    Download PDF
+                    <i class="fas fa-download ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- PDF Generation Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    function generatePDF() {
+        const container = document.querySelector('main');
+        const opt = {
+            margin: 0.5,
+            filename: 'resume.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(container).save();
+    }
+</script>
+{% endblock %}

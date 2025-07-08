@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Start Quiz - {{ topic.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .toast-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(128, 90, 213, 0.85);
+        color: white;
+        padding: 1.2rem 2rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-align: center;
+        z-index: 9999;
+        animation: fadein 0.5s, fadeout 0.5s 4.5s;
+    }
+
+    @keyframes fadein {
+        from { opacity: 0; transform: translate(-50%, -60%); }
+        to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    @keyframes fadeout {
+        from { opacity: 1; transform: translate(-50%, -50%); }
+        to { opacity: 0; transform: translate(-50%, -60%); }
+    }
+
+    .quiz-wrapper {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .quiz-wrapper h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #1e293b;
+        text-align: center;
+    }
+
+    .timer {
+        background-color: #fef9c3;
+        color: #92400e;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .question-block {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.8rem;
+        padding: 1.2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .question-block p {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+
+    .submit-btn {
+        display: block;
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: white;
+        background-color: #10b981;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #059669;
+    }
+</style>
+
+{% if messages %}
+    <div class="toast-container">
+        {% for message in messages %}
+            {% if forloop.first %}
+                {{ message }}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.toast-container').forEach(el => el.remove());
+        }, 5000);
+    </script>
+{% endif %}
+
+<div class="quiz-wrapper">
+    <h2>Quiz: {{ topic.name }}</h2>
+
+    <div class="timer" id="timer">
+        ⏰ Time Left: <span id="countdown">--:--</span>
+    </div>
+
+    <form method="post" action="{% url 'quiz:submit_quiz' topic.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="time_taken" id="timeTakenInput">
+        <input type="hidden" id="timeLimit" value="{{ topic.time_limit|default:1 }}">
+
+        {% for question in questions %}
+            <div class="question-block">
+                <p>Q{{ forloop.counter }}: {{ question.question_text }}</p>
+                {% for option in "1234"|make_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="{{ question.id }}" value="{{ option }}" id="q{{ question.id }}o{{ option }}">
+                        <label class="form-check-label" for="q{{ question.id }}o{{ option }}">
+                            {% if option == '1' %}{{ question.option1 }}
+                            {% elif option == '2' %}{{ question.option2 }}
+                            {% elif option == '3' %}{{ question.option3 }}
+                            {% elif option == '4' %}{{ question.option4 }}
+                            {% endif %}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="submit-btn">Submit Quiz</button>
+    </form>
+</div>
+
+<script>
+    let timeLimit = parseInt(document.getElementById("timeLimit").value) || 1;
+    let time = timeLimit * 60;
+    let timeTaken = 0;
+    let countdownEl = document.getElementById("countdown");
+
+    let quizTimer = setInterval(function () {
+        let minutes = Math.floor(time / 60);
+        let seconds = time % 60;
+        countdownEl.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        time--;
+        timeTaken++;
+
+        if (time < 0) {
+            clearInterval(quizTimer);
+            document.getElementById("timeTakenInput").value = timeLimit * 60;
+            document.forms[0].submit();
+        }
+    }, 1000);
+
+    document.querySelector('form').addEventListener('submit', function () {
+        document.getElementById("timeTakenInput").value = timeTaken;
+    });
+</script>
+{% endblock %}

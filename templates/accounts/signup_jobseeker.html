@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Create Job Seeker Account - Career Hub{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50/50 p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-xl bg-white rounded-xl p-8 relative
+                before:absolute before:inset-0 before:-z-10 before:rounded-xl before:p-1
+                before:bg-gradient-to-r before:from-blue-500 before:via-purple-500 before:to-pink-500
+                before:animate-border-glow
+                after:absolute after:inset-0 after:-z-10 after:rounded-xl after:bg-white">
+
+        <h2 class="text-3xl font-bold mb-8 text-center
+                   bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 
+                   text-transparent bg-clip-text animate-gradient-x">
+            Create Job Seeker Account
+        </h2>
+
+        <!-- Password Requirements Info -->
+        <div class="mb-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
+            <h3 class="font-medium mb-2">Password Requirements:</h3>
+            <ul class="list-disc list-inside space-y-1">
+                <li>At least 8 characters long</li>
+                <li>Must contain at least one uppercase letter</li>
+                <li>Must contain at least one number</li>
+                <li>Must contain at least one special character</li>
+            </ul>
+        </div>
+
+        <!-- Validation Error Box -->
+        {% if form.errors %}
+        <div id="errorPopup" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+            <strong class="font-bold">Please fix the following errors:</strong>
+            <ul class="list-disc list-inside mt-2 text-sm">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            {% for field in form %}
+                {% if field.name != "interests" %}
+                <div class="transform hover:scale-[1.01] transition-all duration-200">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ field.label }}
+                    </label>
+                    <div class="relative group">
+                        {% if field.name == 'email' %}
+                            <input type="email" name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-full p-3 border border-gray-300 rounded-lg" />
+                        {% elif field.name == 'username' %}
+                            <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-full p-3 border border-gray-300 rounded-lg" />
+                        {% elif field.name == 'password1' or field.name == 'password2' %}
+                            <input type="password" name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-full p-3 border border-gray-300 rounded-lg" />
+                        {% elif field.name == "skills" or field.name == "experience" or field.name == "education" %}
+                            <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="4" class="w-full p-3 border border-gray-300 rounded-lg">{{ field.value|default_if_none:'' }}</textarea>
+                        {% elif field.name == 'resume' %}
+                            <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-full p-3 border border-gray-300 rounded-lg" />
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+
+                        {% if field.errors %}
+                        <div class="text-red-500 text-sm mt-1 animate-fade-in">
+                            {{ field.errors|striptags }}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                        <div class="text-gray-500 text-xs mt-1">
+                            {{ field.help_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Job Seeker Interests Section -->
+            <div class="transform hover:scale-[1.01] transition-all duration-200">
+                <label for="interests" class="block text-sm font-medium text-gray-700 mb-1">Select Your Areas of Interest</label>
+                <div class="relative group">
+                    <div class="space-y-2">
+                        {% for value, label in form.interests.field.choices %}
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests" value="{{ value }}" class="form-checkbox text-purple-500"
+                                {% if value in form.interests.value %}checked{% endif %} />
+                            <span class="ml-2">{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.interests.errors %}
+                    <div class="text-red-500 text-sm mt-1 animate-fade-in">
+                        {{ form.interests.errors|striptags }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <button type="submit" 
+                        class="w-full py-3 px-4 rounded-lg text-white text-sm font-medium
+                               bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
+                               hover:from-blue-600 hover:via-purple-600 hover:to-pink-600
+                               transform hover:scale-[1.02] transition-all duration-200
+                               hover:shadow-lg hover:shadow-purple-500/25 animate-gradient-x">
+                    Create Job Seeker Account
+                </button>
+            </div>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-gray-600">
+            Already have an account? 
+            <a href="{% url 'accounts:login' %}" class="text-purple-600 hover:text-pink-600 transition-colors hover:underline">
+                Sign in
+            </a>
+        </p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const interestCheckboxes = document.querySelectorAll('input[name="interests"]');
+        const maxAllowed = 3;
+
+        interestCheckboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                const selected = Array.from(interestCheckboxes).filter(i => i.checked);
+                if (selected.length > maxAllowed) {
+                    checkbox.checked = false;
+                    alert("You can select up to 3 areas of interest.");
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    @keyframes border-glow {
+        0%, 100% {
+            opacity: 1;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
+                        0 0 30px rgba(147, 51, 234, 0.3),
+                        0 0 40px rgba(236, 72, 153, 0.3);
+        }
+        50% {
+            opacity: 0.5;
+            box-shadow: 0 0 24px rgba(59, 130, 246, 0.8),
+                        0 0 36px rgba(147, 51, 234, 0.6),
+                        0 0 48px rgba(236, 72, 153, 0.6);
+        }
+    }
+
+    @keyframes gradient-x {
+        0%, 100% {
+            background-size: 200% 200%;
+            background-position: left center;
+        }
+        50% {
+            background-size: 200% 200%;
+            background-position: right center;
+        }
+    }
+
+    .animate-border-glow {
+        animation: border-glow 3s ease-in-out infinite;
+    }
+
+    .animate-gradient-x {
+        animation: gradient-x 15s ease infinite;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Builder {% endblock %}
+
+{% block content %}
+  <style>
+    :root {
+      --primary: #7B2CBF;
+      --gradient-start: #3B82F6;
+      --gradient-mid: #9333EA;
+      --gradient-end: #EC4899;
+      --radius: 0.75rem;
+    }  
+
+    body {
+      background: #9fc5ff !important;
+    }
+
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #09bafb;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 2rem 0 1rem;
+      font-size: 2.5rem;
+      background: linear-gradient(to right, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding: 0 1rem;
+    }
+
+    .form-container {
+      background: rgb(255, 255, 255);
+      max-width: 960px;
+      margin: 1rem auto 3rem;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-top: 2rem;
+      border-bottom: 2px solid var(--gradient-mid);
+      padding-bottom: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: border 0.3s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--gradient-mid);
+      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+    }
+
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .flex-row .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .btn-add, .btn1 {
+      background: linear-gradient(to right, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn1 {
+      width: 100%;
+      margin-top: 2rem;
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .btn-add:hover, .btn1:hover {
+      background: linear-gradient(to right, #2563eb, #7e22ce, #db2777);
+      box-shadow: 0 8px 16px rgba(147, 51, 234, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .template-options {
+      display: flex;
+      gap: 1.5rem;
+      margin: 2rem 0;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .template-option {
+      width: 280px;
+      border: 2px solid #eee;
+      border-radius: var(--radius);
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .template-option:hover {
+      border-color: var(--gradient-mid);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .template-option.selected {
+      border-color: var(--gradient-mid);
+      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.3);
+    }
+
+    .template-preview {
+      height: 280px;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      border: 1px solid #eee;
+    }
+
+    .template-name {
+      text-align: center;
+      font-weight: bold;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .remove-btn {
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      float: right;
+    }
+
+    .remove-btn:hover {
+      background: #d32f2f;
+    }
+
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+      
+      .template-options {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .template-option {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1> `</h1>
+  <form action="{% url 'jobs:resume' %}" method="post">
+    {% csrf_token %}
+    <div class="form-container">
+
+      <!-- Template Selection -->
+      <h2>Choose a Template</h2>
+      <div class="template-options">
+        <div class="template-option" onclick="selectTemplate(this, 'modern')">
+          <div class="template-preview" style="background-image: url('https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'); background-size: 100% 100%;"></div>
+          <div class="template-name">Modern</div>
+        </div>
+        <div class="template-option" onclick="selectTemplate(this, 'professional')">
+          <div class="template-preview" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'); background-size: 100% 100%;"></div>
+          <div class="template-name">Professional</div>
+        </div>
+        <div class="template-option" onclick="selectTemplate(this, 'creative')">
+          <div class="template-preview" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'); background-size: 100% 100%;"></div>
+          <div class="template-name">Creative</div>
+        </div>
+      </div>
+      <input type="hidden" name="template" id="selectedTemplate" value="modern" required>
+
+      <!-- Personal Info -->
+      <h2>Personal Information</h2>
+      <div class="form-group">
+        <label>Full Name:</label>
+        <input type="text" name="name" placeholder="John Doe" required>
+      </div>
+      <div class="form-group">
+        <label>Professional Summary:</label>
+        <textarea name="about" rows="3" placeholder="Briefly describe your professional background and skills" required></textarea>
+      </div>
+      <div class="flex-row">
+        <div class="form-group">
+          <label>Age:</label>
+          <input type="number" name="age" placeholder="28" required min="0">
+        </div>
+        <div class="form-group">
+          <label>Email:</label>
+          <input type="email" name="email" placeholder="john.doe@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Phone:</label>
+          <input type="tel" name="phone" placeholder="1234567890" required pattern="[0-9]{10}">
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <h2>Skills</h2>
+      <div id="skills"></div>
+      <button type="button" class="btn-add" onclick="addSkill(8)">
+        <i class="fas fa-plus"></i> Add Skill
+      </button>
+
+      <!-- Languages -->
+      <h2>Languages</h2>
+      <div id="languages"></div>
+      <button type="button" class="btn-add" onclick="addLanguage(5)">
+        <i class="fas fa-plus"></i> Add Language
+      </button>
+
+      <!-- Education -->
+      <h2>Education</h2>
+      <div id="education"></div>
+      <button type="button" class="btn-add" onclick="addEducation(4)">
+        <i class="fas fa-plus"></i> Add Education
+      </button>
+
+      <!-- Projects -->
+      <h2>Projects</h2>
+      <div id="projects"></div>
+      <button type="button" class="btn-add" onclick="addProject(6)">
+        <i class="fas fa-plus"></i> Add Project
+      </button>
+
+      <!-- Experience -->
+      <h2>Work Experience</h2>
+      <div id="experience"></div>
+      <button type="button" class="btn-add" onclick="addExperience(5)">
+        <i class="fas fa-plus"></i> Add Experience
+      </button>
+
+      <!-- Achievements -->
+      <h2>Achievements & Certifications</h2>
+      <div id="achievements"></div>
+      <button type="button" class="btn-add" onclick="addField('achievements', 'achievement[]', 'Achievement/Certification', 8)">
+        <i class="fas fa-plus"></i> Add Achievement
+      </button>
+
+      <button type="submit" class="btn1">Generate Resume</button>
+    </div>
+  </form>
+
+  <script>
+    // Add form fields dynamically
+    function addField(containerId, inputName, placeholder, limit) {
+      const container = document.getElementById(containerId);
+      if (container.children.length >= limit) {
+        alert(`You can only add up to ${limit} ${placeholder}s.`);
+        return;
+      }
+
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <input type="text" name="${inputName}" placeholder="${placeholder}" required style="flex: 1;">
+          <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">Remove</button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function addSkill(limit) {
+      const container = document.getElementById('skills');
+      if (container.children.length >= limit) {
+        alert(`Maximum ${limit} skills allowed.`);
+        return;
+      }
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div style="flex: 1;">
+            <label>Skill:</label>
+            <input type="text" name="skill[]" placeholder="e.g., JavaScript, Photoshop" required>
+          </div>
+          <div style="flex: 1;">
+            <label>Proficiency (0-100):</label>
+            <input type="range" name="skill_level[]" min="0" max="100" value="50" required 
+                   oninput="this.nextElementSibling.value = this.value">
+            <output>50</output>%
+          </div>
+          <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">Remove</button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function addLanguage(limit) {
+      const container = document.getElementById('languages');
+      if (container.children.length >= limit) {
+        alert(`Maximum ${limit} languages allowed.`);
+        return;
+      }
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div style="flex: 1;">
+            <label>Language:</label>
+            <input type="text" name="language[]" placeholder="e.g., English, Spanish" required>
+          </div>
+          <div style="flex: 1;">
+            <label>Proficiency:</label>
+            <select name="language_level[]" required>
+              <option value="native">Native</option>
+              <option value="fluent">Fluent</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="basic">Basic</option>
+            </select>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">Remove</button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function addEducation(limit) {
+      const container = document.getElementById('education');
+      if (container.children.length >= limit) {
+        alert(`Maximum ${limit} education entries allowed.`);
+        return;
+      }
+      const block = document.createElement('div');
+      block.className = 'education-block';
+      block.innerHTML = `
+        <div class="flex-row">
+          <div class="form-group"><label>Degree:</label><input type="text" name="degree[]" placeholder="Bachelor of Science" required></div>
+          <div class="form-group"><label>Field of Study:</label><input type="text" name="field[]" placeholder="Computer Science" required></div>
+        </div>
+        <div class="flex-row">
+          <div class="form-group"><label>Institution:</label><input type="text" name="college[]" placeholder="University of Example" required></div>
+          <div class="form-group"><label>Graduation Year:</label><input type="number" name="year[]" placeholder="2020" min="1900" max="2100" required></div>
+        </div>
+        <div class="form-group">
+          <label>Description (optional):</label>
+          <textarea name="education_desc[]" rows="2" placeholder="Honors, awards, or relevant coursework"></textarea>
+        </div>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove Education</button>
+      `;
+      container.appendChild(block);
+    }
+
+    function addProject(limit) {
+      const container = document.getElementById('projects');
+      if (container.children.length >= limit) {
+        alert(`Maximum ${limit} projects allowed.`);
+        return;
+      }
+      const block = document.createElement('div');
+      block.className = 'project-block';
+      block.innerHTML = `
+        <div class="flex-row">
+          <div class="form-group"><label>Project Title:</label><input type="text" name="project_title[]" placeholder="E-commerce Website" required></div>
+          <div class="form-group">
+            <label>Duration:</label>
+            <select name="project_duration[]" required>
+              <option value="1_month">1 Month</option>
+              <option value="3_months">3 Months</option>
+              <option value="6_months">6 Months</option>
+              <option value="1_year" selected>1 Year</option>
+              <option value="2_years">2 Years</option>
+              <option value="more_than_2_years">More than 2 Years</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Project URL (optional):</label>
+          <input type="url" name="project_url[]" placeholder="https://example.com">
+        </div>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove Project</button>
+      `;
+      container.appendChild(block);
+    }
+
+    function addExperience(limit) {
+      const container = document.getElementById('experience');
+      if (container.children.length >= limit) {
+        alert(`Maximum ${limit} work experiences allowed.`);
+        return;
+      }
+      const block = document.createElement('div');
+      block.className = 'experience-block';
+      block.innerHTML = `
+        <div class="flex-row">
+          <div class="form-group"><label>Company:</label><input type="text" name="company[]" placeholder="Tech Corp Inc." required></div>
+        </div>
+        <div class="flex-row">
+          <div class="form-group">
+            <label>Duration:</label>
+            <select name="exp_duration[]" required>
+              <option value="1_month">1 Month</option>
+              <option value="3_months">3 Months</option>
+              <option value="6_months">6 Months</option>
+              <option value="1_year">1 Year</option>
+              <option value="2_years">2 Years</option>
+              <option value="3_years">3 Years</option>
+              <option value="more_than_3_years">More than 3 Years</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description:</label>
+          <textarea name="exp_desc[]" rows="4" placeholder="Describe your responsibilities and achievements" required></textarea>
+        </div>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove Experience</button>
+      `;
+      container.appendChild(block);
+    }
+
+    function selectTemplate(element, templateName) {
+      document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('selected'));
+      element.classList.add('selected');
+      document.getElementById('selectedTemplate').value = templateName;
+    }
+
+    // Initialize form with one entry for each section
+    window.onload = () => {
+      addSkill(8);
+      addLanguage(5);
+      addEducation(4);
+      addProject(6);
+      addExperience(5);
+      addField('achievements', 'achievement[]', 'e.g. : In Sports/ Academics/ Extra-curriculum ativities/ etc.... ', 8);
+      document.querySelector('.template-option').classList.add('selected');
+    }
+  </script>
+{% endblock %}

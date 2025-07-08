@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% block title %}Resume - CareerHub{% endblock %}
+
+{% block extra_head %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    @media print {
+        button {
+            display: none !important;
+        }
+        .no-print-margin {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .download-btn-container {
+            display: none !important;
+        }
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #e03434;
+    }
+
+    .creative-resume {
+        background: linear-gradient(135deg, #559eff 0%, #d4edda 100%);
+    }
+
+    .skill-meter {
+        height: 8px;
+        background: #1289ff;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .skill-level {
+        height: 100%;
+        background: linear-gradient(to right, #ffc107, #28a745);
+        border-radius: 4px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        background: #28a745;
+        border-radius: 50%;
+        border: 2px solid #ffc107;
+    }
+
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 25px;
+        width: 2px;
+        height: calc(100% - 25px);
+        background: linear-gradient(to bottom, #28a745, #ffc107);
+    }
+
+    .timeline-item:last-child::after {
+        display: none;
+    }
+
+    .contact-icon {
+        color: #28a745;
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .creative-header {
+        background: linear-gradient(135deg, #ffc107 0%, #28a745 100%);
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    }
+
+    .section-title {
+        position: relative;
+        padding-bottom: 8px;
+        color: #2c3e50;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(to right, #ffc107, #28a745);
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        background: linear-gradient(to right, #ffc107, #28a745);
+        color: white;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .hover-effect {
+        transition: all 0.3s ease;
+        background: rgb(255, 0, 0);
+    }
+
+    .hover-effect:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.1);
+    }
+
+    .download-btn {
+        background: linear-gradient(135deg, #ffc107 0%, #28a745 100%);
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .download-btn::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255,255,255,0.2);
+        transform: rotate(30deg);
+        transition: all 0.3s;
+        z-index: -1;
+    }
+
+    .download-btn:hover::after {
+        left: 100%;
+    }
+
+    /* Ensure button is visible */
+    .download-btn-container {
+        padding: 20px 0;
+        margin-top: 30px;
+        clear: both;
+    }
+
+    .download-btn-container .download-btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.8rem 2.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #ffffff;
+        background: linear-gradient(135deg, #000000 30%,  #504f55 70%, #bcbbc9 100%);
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 187, 106, 0.3);
+        z-index: 1;
+    }
+
+    .download-btn-container .download-btn i {
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="pt-16 creative-resume no-print-margin" style="background-color: #5f5b6c;">
+    <div class="max-w-5xl mx-auto px-6 py-10 no-print-margin">
+        <!-- Header -->
+        <div class="creative-header text-white text-center px-6 py-16 mb-12 rounded-b-xl" style="background-color: #000000;">
+            <div class="max-w-2xl mx-auto">
+                <h1 class="text-4xl font-bold mb-2">{{ name }}</h1>
+                <p class="text-lg opacity-90">{{ about }}</p>
+                <div class="mt-4 flex justify-center space-x-4">
+                    {% if email %}<span class="text-sm flex items-center"><i class="fas fa-envelope mr-2"></i>{{ email }}</span>{% endif %}
+                    {% if phone %}<span class="text-sm flex items-center"><i class="fas fa-phone mr-2"></i>{{ phone }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Left Sidebar -->
+            <div class="space-y-8">
+                <!-- Profile Summary -->
+                <div class="bg-red p-6 rounded-xl shadow-sm hover-effect"  style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-4 section-title">Profile</h2>
+                    <p class="text-gray-600 text-sm leading-relaxed">{{ summary|default:"Experienced professional with a proven track record..." }}</p>
+                </div>
+
+                <!-- Skills -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-4 section-title">Skills</h2>
+                    <div class="space-y-4">
+                        {% for skill in skills %}
+                            <div>
+                                <div class="flex justify-between text-sm font-medium mb-1">
+                                    <span>{{ skill.name }}</span>
+                                    <span class="text-gray-500">{{ skill.level }}%</span>
+                                </div>
+                                <div class="skill-meter">
+                                    <div class="skill-level" style="width: {{ skill.level }}%"></div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-gray-500">No skills listed.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Languages -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-4 section-title">Languages</h2>
+                    <div class="flex flex-wrap gap-2">
+                        {% for lang in languages %}
+                            <span class="badge">{{ lang.name }}</span>
+                        {% empty %}
+                            <p class="text-gray-500">No languages listed.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-4 section-title">Contact</h2>
+                    <ul class="space-y-3">
+                        {% if email %}<li class="flex items-center"><i class="fas fa-envelope contact-icon mr-3"></i>{{ email }}</li>{% endif %}
+                        {% if phone %}<li class="flex items-center"><i class="fas fa-phone contact-icon mr-3"></i>{{ phone }}</li>{% endif %}
+                        {% if age %}<li class="flex items-center"><i class="fas fa-user contact-icon mr-3"></i>{{ age }} years</li>{% endif %}
+                        {% if location %}<li class="flex items-center"><i class="fas fa-map-marker-alt contact-icon mr-3"></i>{{ location }}</li>{% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="md:col-span-2 space-y-8">
+                <!-- Experience -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-6 section-title">Work Experience</h2>
+                    <div class="space-y-6">
+                        {% for exp in experience %}
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-800">{{ exp.position }}</h3>
+                                        <p class="text-gray-600">{{ exp.company }}</p>
+                                    </div>
+                                    <span class="text-sm bg-gray-100 px-2 py-1 rounded">{{ exp.duration }}</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm">{{ exp.description }}</p>
+                            </div>
+                        {% empty %}
+                            <p class="text-gray-500">No work experience listed.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-6 section-title">Education</h2>
+                    <div class="space-y-6">
+                        {% for edu in education %}
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-800">{{ edu.degree }}</h3>
+                                        <p class="text-gray-600">{{ edu.college }}</p>
+                                    </div>
+                                    <span class="text-sm bg-gray-100 px-2 py-1 rounded">{{ edu.year }}</span>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-gray-500">No education listed.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-6 section-title">Projects</h2>
+                    <div class="space-y-6">
+                        {% for project in projects %}
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="text-lg font-semibold text-gray-800">{{ project.title }}</h3>
+                                    <span class="text-sm bg-gray-100 px-2 py-1 rounded">{{ project.duration }}</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm">{{ project.description }}</p>
+                            </div>
+                        {% empty %}
+                            <p class="text-gray-500">No projects listed.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover-effect" style="background-color: #e0ddef;">
+                    <h2 class="text-xl font-semibold mb-4 section-title">Achievements</h2>
+                    <ul class="space-y-2">
+                        {% for achievement in achievements %}
+                            <li class="flex items-start">
+                                <i class="fas fa-trophy text-warning mt-1 mr-2 text-sm" style="color: #ffc107;"></i>
+                                <span class="text-gray-600 text-sm">{{ achievement }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="text-gray-500">No achievements listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Button - Now properly visible -->
+        <div class="download-btn-container text-center" style="padding: 1rem 0;">
+            <button id="downloadBtn" onclick="generatePDF()" 
+                    style="position: relative;
+                           display: inline-flex;
+                           align-items: center;
+                           justify-content: center;
+                           padding: 0.8rem 2.5rem;
+                           font-size: 1rem;
+                           font-weight: 600;
+                           color: #ffffff;
+                           background: linear-gradient(135deg, #000000 30%,  #504f55 70%, #bcbbc9 100%);
+                           border: none;
+                           border-radius: 50px;
+                           cursor: pointer;
+                           overflow: hidden;
+                           transition: all 0.3s ease;
+                           box-shadow: 0 4px 15px rgba(102, 187, 106, 0.3);
+                           z-index: 1;">
+                Download Resume
+                <i class="fas fa-download" style="margin-left: 0.5rem;"></i>
+                <span style="position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+                            transform: translateX(-100%);
+                            transition: transform 0.4s ease;"></span>
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Simple Back Button with << Symbol -->
+    <div class="back-button no-print" style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+        <a href="{% url 'jobs:index' %}"
+           style="text-decoration: none; font-size: 1.2rem; color: #000000; transition: color 0.3s ease-in-out;"
+           onmouseover="this.style.color='#555555';"
+           onmouseout="this.style.color='#000000';">
+            &lt;&lt;
+        </a>
+    </div>
+</main>
+
+
+<!-- PDF Generation Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+function generatePDF() {
+    const container = document.querySelector('main');
+    const button = document.getElementById('downloadBtn');
+    const backButton = document.querySelector('.back-button');
+
+    // Hide UI elements
+    button.style.display = 'none';
+    if (backButton) backButton.style.display = 'none';
+
+    // Apply scaling
+    container.style.transform = 'scale(0.7)';
+    container.style.transformOrigin = 'top left';
+    container.style.width = '900px'; // Adjust based on target paper size
+
+    const opt = {
+        margin: 0.5,
+        filename: '{{ name|default:"resume" }}.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            letterRendering: true
+        },
+        jsPDF: { unit: 'px', format: 'a3', orientation: 'portrait' }
+    };
+
+    // Generate PDF and show UI back after saving
+    html2pdf().from(container).set(opt).save().then(() => {
+        // Reset styles
+        container.style.transform = 'scale(1)';
+        container.style.width = '';
+
+        button.style.display = 'inline-flex';
+        if (backButton) backButton.style.display = 'flex';
+    });
+}
+
+</script>
+{% endblock %}

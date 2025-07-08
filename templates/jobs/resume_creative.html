@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume - CareerHub{% endblock %}
+
+{% block extra_head %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+    @media print {
+        button, .theme-selector, .back-button {
+            display: none !important;
+        }
+
+        .creative-resume {
+            background: rgb(223, 146, 237) !important;
+        }
+
+        .creative-section,
+        .creative-header {
+            box-shadow: none !important;
+        }
+    }
+
+    .skill-meter {
+        height: 10px;
+        background: #e5e7eb;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .skill-level {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.3s ease;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 25px;
+        width: 2px;
+        height: calc(100% - 25px);
+    }
+
+    .timeline-item:last-child::after {
+        display: none;
+    }
+
+    .contact-icon {
+        font-size: 1rem;
+    }
+
+    /* Theme Modal Styles */
+    .theme-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    .theme-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        max-width: 800px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .theme-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .theme-option {
+        height: 120px;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .theme-modal.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .theme-modal.hidden {
+        display: none;
+    }
+
+    .theme-option:hover {
+        transform: scale(1.05);
+    }
+
+    .theme-option .preview-header {
+        width: 100%;
+        height: 30px;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+
+    .theme-option .preview-sidebar {
+        width: 30%;
+        height: 30px;
+        background: #fff;
+        margin-top: 5px;
+    }
+
+    .theme-option .preview-main {
+        width: 70%;
+        height: 30px;
+        background: #fff;
+        margin-top: 5px;
+    }
+
+    .theme-name {
+        margin-top: 0.5rem;
+        font-weight: 600;
+    }
+
+    .close-theme-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: white;
+    }
+
+    .theme-selector-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #6a11cb, #2575fc);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        cursor: pointer;
+        font-size: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        transition: all 0.3s ease;
+    }
+
+    .theme-selector-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Back button styles */
+    .back-button {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 50;
+    }
+
+    .back-button a {
+        text-decoration: none;
+        font-size: 1.5rem;
+        color: #000000;
+        transition: color 0.3s ease-in-out;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 0.5rem 1rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .back-button a:hover {
+        color: #555555;
+        background: rgba(255, 255, 255, 0.9);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="pt-16 creative-resume font-sans bg-gradient-to-br from-blue-100 to-blue-100 text-blue-800">
+    <div class="max-w-5xl mx-auto px-6 py-10">
+
+        <!-- Header -->
+        <div class="creative-header text-white text-center px-6 py-12 rounded-b-3xl shadow-xl bg-gradient-to-r from-purple-700 to-blue-500 mb-10">
+            <h1 class="text-4xl font-extrabold">{{ name }}</h1>
+            <p class="text-xl mt-2">{{ about }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Sidebar -->
+            <div class="space-y-6">
+                <!-- Contact -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Contact</h2>
+                    <div class="flex items-center mb-2"><i class="fas fa-envelope contact-icon mr-3"></i>{{ email }}</div>
+                    <div class="flex items-center mb-2"><i class="fas fa-phone contact-icon mr-3"></i>{{ phone }}</div>
+                    <div class="flex items-center"><i class="fas fa-birthday-cake contact-icon mr-3"></i>Age: {{ age }}</div>
+                </div>
+
+                <!-- Skills -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Skills</h2>
+                    {% for skill in skills %}
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>{{ skill.name }}</span>
+                                <span>{{ skill.level }}%</span>
+                            </div>
+                            <div class="skill-meter">
+                                <div class="skill-level" style="width: {{ skill.level }}%; background: linear-gradient(to right, #6a11cb, #2575fc);"></div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No skills listed.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Languages -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Languages</h2>
+                    {% for lang in languages %}
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>{{ lang.name }}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No languages listed.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="md:col-span-2 space-y-8">
+                <!-- Experience -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Experience</h2>
+                    {% for exp in experience %}
+                        <div class="timeline-item">
+                            <div class="text-sm text-blue-600 font-semibold">{{ exp.duration }}</div>
+                            <div class="text-lg font-bold">{{ exp.position }}</div>
+                            <div class="text-gray-500">{{ exp.company }}</div>
+                            <p class="mt-2">{{ exp.description }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No work experience listed.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Education -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Education</h2>
+                    {% for edu in education %}
+                        <div class="timeline-item">
+                            <div class="text-sm text-blue-600 font-semibold">{{ edu.year }}</div>
+                            <div class="text-lg font-bold">{{ edu.degree }}</div>
+                            <div class="text-gray-500">{{ edu.college }}</div>
+                        </div>
+                    {% empty %}
+                        <p>No education listed.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Projects -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Projects</h2>
+                    {% for project in projects %}
+                        <div class="timeline-item">
+                            <div class="text-lg font-semibold">{{ project.title }}</div>
+                            <div class="text-sm text-blue-600">{{ project.duration }}</div>
+                            <p class="mt-2">{{ project.description }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No projects listed.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Achievements -->
+                <div class="creative-section bg-white p-5 rounded-xl shadow-md">
+                    <h2 class="text-lg font-bold text-purple-700 border-b pb-2 mb-4 uppercase">Achievements</h2>
+                    <ul class="list-disc list-inside">
+                        {% for achievement in achievements %}
+                            <li class="mb-1">{{ achievement }}</li>
+                        {% empty %}
+                            <li>No achievements listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-12" id="actionButtons">
+            <button onclick="generatePDF()" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4" id="downloadBtn">
+                Download PDF
+                <i class="fas fa-download ml-2"></i>
+            </button>
+            <button onclick="openThemeModal()" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1" id="themeBtn">
+                Change Theme
+                <i class="fas fa-palette ml-2"></i>
+            </button>
+        </div>
+    </div>
+     <!-- Back Button -->
+     <div class="back-button">
+        <a href="{% url 'jobs:index' %}" id="backButton">
+            &lt;&lt;
+        </a>
+    </div>
+</main>
+
+<!-- Theme Selector Button (Floating) -->
+<button class="theme-selector-btn" onclick="openThemeModal()" id="floatingThemeBtn">
+    <i class="fas fa-palette"></i>
+</button>
+
+<!-- Theme Modal -->
+<div id="themeModal" class="theme-modal hidden fixed right-4 bottom-20 z-50">
+    <div class="bg-white rounded-xl shadow-2xl p-4 w-64">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-bold text-lg">Select Theme</h3>
+            <button onclick="closeThemeModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+            <!-- Ocean Blue -->
+            <div onclick="applyTheme('ocean')" class="h-12 rounded-lg bg-gradient-to-r from-blue-700 to-teal-500 cursor-pointer hover:opacity-90"></div>
+            
+            <!-- Royal Purple -->
+            <div onclick="applyTheme('royal')" class="h-12 rounded-lg bg-gradient-to-r from-purple-800 to-indigo-700 cursor-pointer hover:opacity-90"></div>
+            
+            <!-- Forest Green -->
+            <div onclick="applyTheme('forest')" class="h-12 rounded-lg bg-gradient-to-r from-green-700 to-emerald-500 cursor-pointer hover:opacity-90"></div>
+            
+            <!-- Sunset Orange -->
+            <div onclick="applyTheme('sunset')" class="h-12 rounded-lg bg-gradient-to-r from-orange-600 to-pink-600 cursor-pointer hover:opacity-90"></div>
+            
+            <!-- Midnight Dark -->
+            <div onclick="applyTheme('midnight')" class="h-12 rounded-lg bg-gradient-to-r from-gray-800 to-gray-900 cursor-pointer hover:opacity-90"></div>
+            
+            <!-- Coral Reef -->
+            <div onclick="applyTheme('coral')" class="h-12 rounded-lg bg-gradient-to-r from-red-500 to-yellow-500 cursor-pointer hover:opacity-90"></div>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    function generatePDF() {
+        const container = document.querySelector('main');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        const floatingThemeBtn = document.getElementById('floatingThemeBtn');
+        const backButton = document.querySelector('.back-button');
+
+        // Hide UI elements
+        downloadBtn.style.display = 'none';
+        themeBtn.style.display = 'none';
+        floatingThemeBtn.style.display = 'none';
+        if (backButton) backButton.style.display = 'none';
+
+        // Apply scaling
+        container.style.transform = 'scale(0.7)';
+        container.style.transformOrigin = 'top left';
+        container.style.width = '900px'; // Adjust based on target paper size
+
+        const opt = {
+            margin: 0.5,
+            filename: '{{ name|default:"resume" }}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                letterRendering: true
+            },
+            jsPDF: { unit: 'px', format: 'a3', orientation: 'portrait' }
+        };
+
+        // Generate PDF and show UI back after saving
+        html2pdf().from(container).set(opt).save().then(() => {
+
+            // Reset styles
+            container.style.transform = 'scale(1)';
+            container.style.width = '';
+
+            downloadBtn.style.display = 'inline-flex';
+            themeBtn.style.display = 'inline-flex';
+            floatingThemeBtn.style.display = 'flex';
+            if (backButton) backButton.style.display = 'flex';
+        });
+    }
+
+    // Theme Functions
+    function openThemeModal() {
+        document.getElementById('themeModal').style.display = 'flex';
+    }
+
+    function closeThemeModal() {
+        document.getElementById('themeModal').style.display = 'none';
+    }
+
+    function applyTheme(theme) {
+        const resume = document.querySelector('.creative-resume');
+        const header = document.querySelector('.creative-header');
+        const sections = document.querySelectorAll('.creative-section');
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        const skillLevels = document.querySelectorAll('.skill-level');
+        const contactIcons = document.querySelectorAll('.contact-icon');
+        const sectionTitles = document.querySelectorAll('.creative-section h2');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        const floatingThemeBtn = document.getElementById('floatingThemeBtn');
+
+        // Reset all classes first
+        resume.className = 'pt-16 creative-resume font-sans';
+        header.className = 'creative-header text-white text-center px-6 py-12 rounded-b-3xl shadow-xl mb-10';
+        
+        sections.forEach(section => {
+            section.className = 'creative-section p-5 rounded-xl shadow-md';
+        });
+        
+        function openThemeModal() {
+        const modal = document.getElementById('themeModal');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    }
+
+    function closeThemeModal() {
+        const modal = document.getElementById('themeModal');
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('themeModal');
+        const themeBtn = document.querySelector('.theme-selector-btn');
+        
+        if (!modal.contains(event.target)) {
+            if (event.target !== themeBtn && !themeBtn.contains(event.target)) {
+                closeThemeModal();
+            }
+        }
+    });
+        // Apply selected theme
+        switch(theme) {
+            case 'ocean':
+                resume.classList.add('bg-gradient-to-br', 'from-blue-50', 'to-blue-100', 'text-blue-800');
+                header.classList.add('bg-gradient-to-r', 'from-blue-700', 'to-teal-500');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #1e3a8a, #0d9488)');
+                contactIcons.forEach(icon => icon.style.color = '#1e3a8a');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-blue-700');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #1e3a8a, #0d9488)';
+                break;
+                
+            case 'royal':
+                resume.classList.add('bg-gradient-to-br', 'from-purple-50', 'to-purple-100', 'text-purple-800');
+                header.classList.add('bg-gradient-to-r', 'from-purple-800', 'to-indigo-700');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #6b21a8, #4338ca)');
+                contactIcons.forEach(icon => icon.style.color = '#6b21a8');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-purple-700');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #6b21a8, #4338ca)';
+                break;
+                
+            case 'forest':
+                resume.classList.add('bg-gradient-to-br', 'from-green-50', 'to-green-100', 'text-green-800');
+                header.classList.add('bg-gradient-to-r', 'from-green-700', 'to-emerald-500');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #166534, #047857)');
+                contactIcons.forEach(icon => icon.style.color = '#166534');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-green-700');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #166534, #047857)';
+                break;
+                
+            case 'sunset':
+                resume.classList.add('bg-gradient-to-br', 'from-orange-50', 'to-pink-50', 'text-orange-800');
+                header.classList.add('bg-gradient-to-r', 'from-orange-600', 'to-pink-600');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #c2410c, #9d174d)');
+                contactIcons.forEach(icon => icon.style.color = '#c2410c');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-orange-600');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #c2410c, #9d174d)';
+                break;
+                
+            case 'midnight':
+                resume.classList.add('bg-gradient-to-br', 'from-gray-100', 'to-gray-200', 'text-gray-800');
+                header.classList.add('bg-gradient-to-r', 'from-gray-800', 'to-gray-900');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #1f2937, #111827)');
+                contactIcons.forEach(icon => icon.style.color = '#1f2937');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-gray-800');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #1f2937, #111827)';
+                break;
+                
+            case 'coral':
+                resume.classList.add('bg-gradient-to-br', 'from-red-50', 'to-yellow-50', 'text-red-800');
+                header.classList.add('bg-gradient-to-r', 'from-red-500', 'to-yellow-500');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #dc2626, #ca8a04)');
+                contactIcons.forEach(icon => icon.style.color = '#dc2626');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-red-600');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-red-500 to-yellow-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-red-500 to-yellow-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #dc2626, #ca8a04)';
+                break;
+                
+            default:
+                // Default theme (original)
+                resume.classList.add('bg-gradient-to-br', 'from-blue-100', 'to-blue-100', 'text-blue-800');
+                header.classList.add('bg-gradient-to-r', 'from-purple-700', 'to-blue-500');
+                sections.forEach(section => section.classList.add('bg-white'));
+                skillLevels.forEach(level => level.style.background = 'linear-gradient(to right, #6a11cb, #2575fc)');
+                contactIcons.forEach(icon => icon.style.color = '#6a11cb');
+                sectionTitles.forEach(title => {
+                    title.classList.add('border-b', 'pb-2', 'mb-4', 'uppercase');
+                    title.classList.remove('text-purple-700');
+                    title.classList.add('text-purple-700');
+                });
+                downloadBtn.className = 'px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1 mr-4';
+                themeBtn.className = 'px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold rounded-full hover:shadow-lg transition-transform hover:-translate-y-1';
+                floatingThemeBtn.style.background = 'linear-gradient(45deg, #6a11cb, #2575fc)';
+        }
+
+        closeThemeModal();
+    }
+</script>
+{% endblock %}
