@@ -4,6 +4,16 @@ CareerHub is a modern career platform built with **Django**, designed to seamles
 
 
 ## 📸 Screenshots
+![Home Page](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/home_page.jpg)
+![Find Jobs](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/find_jobs.jpg)
+![Featured Jobs](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/featured_jobs.jpg)
+![Featured Companies](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/featured_comp.jpg)
+![Job Description](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/job_desc.jpg)
+![Resume Maker](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/resume.jpg)
+![Resume Output](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/resume_output.jpg)
+![Quiz Page](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/quiz.jpg)
+![Quiz Rankings](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/quiz_ranks.jpg)
+![Signup Page](https://raw.githubusercontent.com/Puravshah321/CareerHub/main/logos/github_sc/signup.jpg)
 
 ---
 
